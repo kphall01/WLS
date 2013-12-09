@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='utf-8'?>
+<dashboard>
+    <label>Commands</label>
+    <row>
+        <table>
+            <searchString>
+| search `wlslogs` BaseFileName="netsh.exe" CommandLine="*" 
+| eval UserName=if(isnull(SubjectUserName),UserName,SubjectUserName) 
+| convert ctime(_time) AS time timeformat="%m/%d/%Y %H:%M:%S"
+| table time, host, UserName, CreatorProcessName, CommandLine
+| rename time AS Time, host AS Host, UserName AS User, CreatorProcessName AS "Creator Process", CommandLine AS "Command Line"
+            </searchString>
+            <title>Netsh</title>
+            <earliestTime>-24h@h</earliestTime>
+            <latestTime>now</latestTime>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+    <row>
+        <table>
+            <searchString>
+| search `wlslogs` BaseFileName="reg.exe" CommandLine="*" 
+| eval UserName=if(isnull(SubjectUserName),UserName,SubjectUserName) 
+| convert ctime(_time) AS time timeformat="%m/%d/%Y %H:%M:%S"
+| table time, host, UserName, CreatorProcessName, CommandLine
+| rename time AS Time, host AS Host, UserName AS User, CreatorProcessName AS "Creator Process", CommandLine AS "Command Line"
+            </searchString>
+            <title>Reg</title>
+            <earliestTime>-24h@h</earliestTime>
+            <latestTime>now</latestTime>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+    <row>
+        <table>
+            <searchString>
+| search `wlslogs` BaseFileName="route.exe" CommandLine="*" 
+| eval UserName=if(isnull(SubjectUserName),UserName,SubjectUserName) 
+| convert ctime(_time) AS time timeformat="%m/%d/%Y %H:%M:%S"
+| table time, host, UserName, CreatorProcessName, CommandLine
+| rename time AS Time, host AS Host, UserName AS User, CreatorProcessName AS "Creator Process", CommandLine AS "Command Line"
+            </searchString>
+            <title>Route</title>
+            <earliestTime>-24h@h</earliestTime>
+            <latestTime>now</latestTime>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+    <row>
+        <table>
+            <searchString>
+| search `wlslogs` EventID="592" OR EventID="4688" CommandLine="*" 
+| regex CommandLine=".*((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.|$)){4}.*" 
+| stats count as CommandCount by CreatorProcessName,BaseFileName,CommandLine 
+| rex field=CommandLine "(?&lt;cli_ip&gt;\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})" 
+| table CommandCount, CreatorProcessName, BaseFileName, cli_ip, CommandLine
+| sort -CommandCount
+| rename CommandCount AS "Command Count", CreatorProcessName AS "Creator Process", BaseFileName AS "Base File", cli_ip AS "CLI IP Address", CommandLine AS "Command Line"
+            </searchString>
+            <title>IPv4</title>
+            <earliestTime>-24h@h</earliestTime>
+            <latestTime>now</latestTime>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+    <row>
+        <table>
+            <searchString>
+| search `wlslogs` BaseFileName="psexec.exe" CommandLine="*" 
+| eval UserName=if(isnull(SubjectUserName),UserName,SubjectUserName) 
+| convert ctime(_time) AS time timeformat="%m/%d/%Y %H:%M:%S"
+| table time, host, UserName, CreatorProcessName, CommandLine
+| rename time AS Time, host AS Host, UserName AS User, CreatorProcessName AS "Creator Process", CommandLine AS "Command Line"
+            </searchString>
+            <title>PsExec</title>
+            <earliestTime>-24h@h</earliestTime>
+            <latestTime>now</latestTime>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+</dashboard>

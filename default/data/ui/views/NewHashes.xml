@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<dashboard>
+  <label>New Hashes</label>
+  <row>
+    <table>
+      <searchString>
+          inputlookup dllmd5tracker.csv | eval _time=FirstSeen | where now()-FirstSeen&lt;2200 | convert ctime(FirstSeen)
+      </searchString>
+      <title>New EXE Hashes</title>
+      <earliestTime>-24h@h</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="count">15</option>
+      <option name="displayRowNumbers">true</option>
+    </table>
+  </row>
+</dashboard>

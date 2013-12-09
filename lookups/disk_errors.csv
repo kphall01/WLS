@@ -1,0 +1,7 @@
+"EventID","EventDescription"
+"7","The device has a bad block."
+"11","The driver detected a controller error."
+"15","The device is not ready for access yet."
+"51","An error was detected on the device during a paging operation."
+"52","The driver has detected that a device has predicted that it will fail. Immediately back up your data and replace your hard disk drive. A failure may be imminent."
+

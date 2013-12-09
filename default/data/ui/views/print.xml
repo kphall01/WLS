@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='utf-8'?>
+<dashboard>
+  <label>Print Dashboard</label>
+  <row>
+    <chart>
+      <searchString>`wlslogs` (EventID=13 OR EventID=307) (Print OR PrintService) |`GetPrintInfo`| chart sum(Pages) as TotalPages by date_hour date_wday</searchString>
+      <title>Print - Pages Per Hour Last 7 Days Combined</title>
+      <earliestTime>-6d@d</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="charting.chart">line</option>
+      <option name="charting.chart.nullValueMode">zero</option>
+    </chart>
+  </row>
+  <row>
+    <chart>
+      <searchString>`wlslogs` (EventID=13 OR EventID=307) (Print OR PrintService) |`GetPrintInfo`| eval day=date_mday."-".date_wday | stats sum(Pages) as TotalPages by day</searchString>
+      <title>Print - Pages Per Day Last 7 Days</title>
+      <earliestTime>-6d@d</earliestTime>
+    </chart>
+    <chart>
+      <searchString>`wlslogs` (EventID=13 OR EventID=307) (Print OR PrintService) |`GetPrintInfo`| timechart span="15m" sum(Pages)</searchString>
+      <title>Print - Pages Per 15m Last 24 Hours</title>
+      <earliestTime>-24h@h</earliestTime>
+      <latestTime>now</latestTime>
+    </chart>
+  </row>
+  <row>
+    <table>
+      <searchString>`wlslogs` (EventID=13 OR EventID=307) (Print OR PrintService) |`GetPrintInfo`|  where Pages > 20 | table _time,Printer,FileName,Pages</searchString>
+      <title>Print - Large Print Jobs Last 24 Hours	</title>
+      <earliestTime>-24h@h</earliestTime>
+      <latestTime>now</latestTime>
+    </table>
+  </row>
+</dashboard>

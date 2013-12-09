@@ -1,0 +1,177 @@
+<?xml version='1.0' encoding='utf-8'?>
+<dashboard>
+  <label>Client Overview</label>
+  <row>
+    <table>
+      <searchString>`wlslogs` WLS_WMI MonitorName=ComputerSystem 
+| dedup host 
+| fillnull value="N/A" 
+| stats count by Manufacturer 
+| sort -count 
+| addtotals col=t row=f labelfield=Manufacturer label=Total count</searchString>
+      <title>Manufacturer Totals</title>
+      <earliestTime>-25h</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="count">20</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="displayRowNumbers">true</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <searchString>`wlslogs` WLS_WMI MonitorName=ComputerSystem 
+| dedup host 
+| fillnull value="N/A" 
+| stats count by Manufacturer,Model 
+| sort -count 
+| addtotals col=t row=f labelfield=Manufacturer label=Total count
+| rename count AS Count</searchString>
+      <title>Manufacturer / Model Totals</title>
+      <earliestTime>-25h</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="count">20</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="displayRowNumbers">true</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <searchString>| search `wlslogs` WLS_WMI MonitorName=ComputerSystem 
+| dedup host 
+| fillnull value="N/A" 
+| stats count by SystemType 
+| sort -count 
+| addtotals col=t row=f labelfield=SystemType label=Total count
+| rename SystemType AS "System Type", count AS Count
+            </searchString>
+      <title>System Type Totals</title>
+      <earliestTime>-25h</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="count">20</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="displayRowNumbers">true</option>
+    </table>
+    <table>
+      <searchString>`wlslogs` WLS_WMI MonitorName=ComputerSystem 
+| dedup host 
+| fillnull value="N/A" 
+| stats count by DomainRole
+| lookup DomainRole.csv Value AS DomainRole OUTPUT Meaning
+| rename Meaning AS DomainRole 
+| fillnull value="N/A" 
+| sort -count 
+| addtotals col=t row=f labelfield=DomainRole label=Total count
+| rename DomainRole AS "Domain Role", count AS Count</searchString>
+      <title>Domain Role Totals</title>
+      <earliestTime>-25h</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="count">20</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="displayRowNumbers">true</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <searchString>
+| search `wlslogs` WLS_WMI MonitorName=OperatingSystem | dedup host | fillnull value="N/A" | stats count by Caption,OSArchitecture,Version,ServicePackMajorVersion,ServicePackMinorVersion | sort -count | addcoltotals count
+            </searchString>
+      <title>Operating System Totals</title>
+      <earliestTime>-25h</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="count">20</option>
+      <option name="dataOverlayMode">none</option>
+      <option name="displayRowNumbers">true</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <searchString>
+`wlslogs` WLS_WMI MonitorName=ComputerSystem 
+| dedup host 
+| fillnull value="N/A" 
+| stats count by PCSystemType
+| lookup PCSystemType.csv Value AS PCSystemType OUTPUT Meaning
+| rename Meaning AS PCSystemType 
+| fillnull value="N/A" 
+| sort -count 
+| addtotals col=t row=f labelfield=PCSystemType label=Total count
+| rename PCSystemType AS "PC System Type", count AS Count
+      </searchString>
+      <title>PC System Type Totals</title>
+      <earliestTime>-25h</earliestTime>
+      <latestTime>now</latestTime>
+    </table>
+  </row>
+  <row>
+    <table>
+      <searchString>
+`wlslogs` WLS_WMI MonitorName=ComputerSystem 
+| dedup host 
+| fillnull value="N/A" 
+| stats count by ChassisBootupState
+| lookup ChassisBootupState.csv Value AS ChassisBootupState OUTPUT Meaning
+| rename Meaning AS ChassisBootupState 
+| fillnull value="N/A" 
+| sort -count 
+| addtotals col=t row=f labelfield=ChassisBootupState label=Total count
+| rename ChassisBootupState AS "Chassis Bootup State", count AS Count
+      </searchString>
+      <title>Chassis Bootup State Totals</title>
+      <earliestTime>-25h</earliestTime>
+      <latestTime>now</latestTime>
+    </table>
+    <table>
+      <searchString>
+`wlslogs` WLS_WMI MonitorName=ComputerSystem 
+| dedup host 
+| fillnull value="N/A" 
+| stats count by WakeUpType
+| lookup WakeUpType.csv Value AS WakeUpType OUTPUT Meaning
+| rename Meaning AS WakeUpType 
+| fillnull value="N/A" 
+| sort -count 
+| addtotals col=t row=f labelfield=WakeUpType label=Total count
+| rename WakeUpType AS "Wake Up Type", count AS Count
+      </searchString>
+      <title>Wake Up Type Totals</title>
+      <earliestTime>-25h</earliestTime>
+      <latestTime>now</latestTime>
+    </table>
+  </row>
+  <row>
+    <table>
+      <searchString>
+`wlslogs` WLS_WMI MonitorName=ComputerSystem 
+| dedup host 
+| fillnull value="N/A" 
+| stats count by PowerSupplyState
+| lookup PowerSupplyState.csv Value AS PowerSupplyState OUTPUT Meaning
+| rename Meaning AS PowerSupplyState 
+| fillnull value="N/A" 
+| sort -count 
+| addtotals col=t row=f labelfield=PowerSupplyState label=Total count
+| rename PowerSupplyState AS "Power Supply State", count AS Count
+      </searchString>
+      <title>Power Supply State Totals</title>
+      <earliestTime>-25h</earliestTime>
+      <latestTime>now</latestTime>
+    </table>
+    <table>
+      <searchString>
+`wlslogs` WLS_WMI MonitorName=ComputerSystem 
+| dedup host 
+| fillnull value="N/A" 
+| stats count by ThermalState
+| lookup ThermalState.csv Value AS ThermalState OUTPUT Meaning
+| rename Meaning AS ThermalState 
+| fillnull value="N/A" 
+| sort -count 
+| addtotals col=t row=f labelfield=ThermalState label=Total count
+| rename ThermalState AS "Thermal State", count AS Count
+      </searchString>
+      <title>Thermal State Totals</title>
+      <earliestTime>-25h</earliestTime>
+      <latestTime>now</latestTime>
+    </table>
+  </row>
+</dashboard>

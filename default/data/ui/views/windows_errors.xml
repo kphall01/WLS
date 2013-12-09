@@ -1,0 +1,214 @@
+
+<form>
+    <label>Windows Information</label>
+        <fieldset>
+        <input type="text" token="hostname">
+            <label>Host</label>
+            <default>*</default>
+        </input>
+        <input type="time">
+            <default>Last 24 hours</default>
+        </input>
+    </fieldset>
+    <row>
+        <table>
+            <searchString>
+| search `wlslogs` host=$hostname$ ProviderName="Application Hang" 
+| stats count by host, Data4 ,Data
+| sort -count 
+| rename host AS Host, Data4 as Application, count AS Count,Data as Version
+            </searchString>
+            <title>Application Hang By Host/Application</title>
+            <option name="count">10</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+    <row>
+        <table>
+            <searchString>				
+| search `wlslogs` host=$hostname$ ProviderName="Application Hang"
+| stats count by Data4 ,Data
+| sort -count 
+| rename Data4 as Application, count AS Count,Data as Version
+            </searchString>
+            <title>Application Hang By Application</title>
+            <option name="count">10</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+    <row>
+        <table>
+            <searchString>				
+| search `wlslogs` host=$hostname$ ProviderName="Application Error" 
+| stats count by host, Data9 ,Data3,Data2
+| sort -count 
+| rename host AS Host, Data9 as Application, count AS Count,Data3 as Version,Data2 as "Faulting Module"
+            </searchString>
+            <title>Application Error By Host/Application</title>
+            <option name="count">10</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+    <row>
+        <table>
+            <searchString>				
+| search `wlslogs` host=$hostname$ ProviderName="Application Error" 
+| stats count by Data9 ,Data3,Data2
+| sort -count 
+| rename Data9 as Application, count AS Count,Data3 as Version,Data2 as "Faulting Module"
+            </searchString>
+            <title>Application Error By Application</title>
+            <option name="count">10</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+    <row>
+        <table>
+            <searchString>				
+| search `wlslogs` host=$hostname$ ProviderName="Application Popup" 
+| stats count by EventData, Data 
+| sort -count 
+| rename EventData AS "Event Data", count AS Count 
+            </searchString>
+            <title>Application Popup</title>
+            <option name="count">10</option>
+            <option name="displayRowNumbers">true</option>
+        </table>    
+    </row>
+    <row>
+        <table>
+            <searchString>
+| search `wlslogs` host=$hostname$ ProviderName="Disk" 
+| stats count by host, EventData, EventID 
+| sort -count 
+| lookup disk_errors.csv EventID as EventID OUTPUT EventDescription
+| rename host AS Host, EventData AS "Disk", count AS Count 
+
+            </searchString>
+            <title>Disk Errors</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+        <table>
+            <searchString>
+| search `wlslogs` host=$hostname$ ProviderName="Display" 
+| stats count by host, EventID 
+| sort -count 
+| lookup display_errors.csv EventID as EventID OUTPUT 
+| rename host AS Host, EventID AS "Event ID", count AS Count
+            </searchString>
+            <title>Display Errors</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+    <row>
+        <table>
+            <searchString>
+| search `wlslogs` host=$hostname$ ProviderName="Microsoft-Windows-WHEA-Logger" 
+| fillnull ErrorType value=0
+| stats count by host,EventID,ErrorType 
+| lookup whea_errors.csv EventID as EventID, ErrorType as ErrorType OUTPUT EventDescription, ErrorDescription 
+| table host,EventID,ErrorType,count,EventDescription,ErrorDescription
+            </searchString>
+            <title>Hardware Errors</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+    <row>
+        <table>
+            <searchString>
+| search `wlslogs` host=$hostname$ ProviderName="Ntfs" 
+| stats count by host, EventID 
+| sort -count 
+| lookup ntfs_errors.csv EventID as EventID OUTPUT EventDescription
+| rename host AS Host, EventID AS "Event ID", count AS Count 
+            </searchString>
+            <title>NTFS Errors</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+        <table>
+            <searchString>
+| search `wlslogs` host=$hostname$ ProviderName="Scecli" NOT EventID="1704" 
+| stats count by host, EventID 
+| sort -count
+| lookup gp_errors.csv EventID as EventID OUTPUT EventDescription
+| rename host AS Host, EventID AS "Event ID", count AS Count 
+            </searchString>
+            <title>Group Policy Errors</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+    <row>
+        <table>
+            <searchString>
+| search `wlslogs` host=$hostname$ ProviderName="Tcpip" 
+| stats count by host, EventID 
+| sort -count 
+| lookup tcpip_errors.csv EventID as EventID OUTPUT EventDescription
+| rename host AS Host, EventID AS "Event ID", count AS Count 
+            </searchString>
+            <title>Tcpip Errors</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+        <table>
+            <searchString>
+| search `wlslogs` host=$hostname$ ProviderName="Wins" 
+| stats count by host, EventID 
+| sort -count 
+| lookup wins_errors.csv EventID as EventID OUTPUT EventDescription
+| rename host AS Host, EventID AS "Event ID", count AS Count 
+            </searchString>
+            <title>Wins Errors</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+    <row>
+        <table>
+            <searchString>
+| search `wlslogs` host=$hostname$ ProviderName="Windows Error Reporting" NOT WindowsUpdateFailure 
+| stats count by host 
+| sort -count 
+| rename host AS Host, count AS Count 
+            </searchString>
+            <title>Windows Error Reporting (Non Windows Update)</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+        <table>
+            <searchString>
+| search `wlslogs` host=$hostname$ ProviderName="Windows Error Reporting" WindowsUpdateFailure 
+| stats count by host 
+| sort -count 
+| rename host AS Host, count AS Count 
+            </searchString>
+            <title>Windows Update Failure</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+    <row>
+        <table>
+            <searchString>
+`wlslogs` host=$hostname$ ProviderName="Microsoft-Windows-Reliability-Analysis-Engine" 
+| dedup host 
+| eval RS=round(Stability,0) 
+                | stats count as count by RS 
+                | eventstats sum(count) as total 
+                | eval Percent=(round(count/total,4)*100)."%" 
+| fields - total
+                | rename RS as Stability 
+                | sort -Stability
+                | addtotals col=t row=f labelfield=Stability label=Total count
+            </searchString>
+            <title>Host Stability</title>
+            <option name="count">11</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+</form>

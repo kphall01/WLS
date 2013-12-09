@@ -1,0 +1,13 @@
+<nav>
+    <view name="wls_overview" default='true' />
+    <view name="client_overview" />
+    <view name="host_overview" />
+    <view name="host_drilldown" />
+    <view name="windows_errors" />
+    <view name="commands"/>
+    <view name="media" />
+    <view name="print"/>
+    <view name="usb_devices"/>
+    <view name="NewHashes"/>
+    <view name="wls_errors" />
+</nav>

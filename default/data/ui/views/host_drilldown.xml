@@ -1,0 +1,303 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form>
+    <label>Host Drilldown</label>
+    <fieldset>
+        <input type="text" token="hostname">
+            <label>Host</label>
+        </input>
+        <input type="time">
+            <default>Last 24 hours</default>
+        </input>
+    </fieldset>
+    <row>
+        <table>
+            <searchString>
+| search `wlslogs` host=$hostname$ (WLS_WMI MonitorName="OperatingSystem") OR WMI_OperatingSystem 
+| head 1 
+| rename Caption as OSName 
+| rename Manufacturer as OSMfr 
+| join type=outer host [ | search host=$hostname$ (WLS_WMI MonitorName="ComputerSystem") OR WMI_ComputerSystem | head 1 | fields Model,TotalPhysicalMemory,Manufacturer,host,Domain,NumberOfProcessors,NumberOfLogicalProcessors,Status ] 
+| eval NumberOfLogicalProcessors=if(isnull(NumberOfLogicalProcessors),NumberOfProcessors,NumberOfLogicalProcessors) 
+| eval MemoryMB=TotalPhysicalMemory/(1024*1024) 
+| eval Proc_Logical_Real=NumberOfLogicalProcessors." / ".NumberOfProcessors 
+| eval current_time=now()
+| rex field=LastBootUpTime "(?P&lt;boot_base&gt;[0-9]+\.[0-9]*)(?P&lt;boot_offset_minutes&gt;[+-]?[0-9]*)"
+| eval boot_offset_hours=boot_offset_minutes/60
+| eval boot_adjusted=boot_base.boot_offset_hours
+| eval boot_time=strptime(boot_adjusted,"%Y%m%d%H%M%S.%f%z") 
+| eval time_diff=(current_time-boot_time) 
+| eval UpTime=time_diff/(24*60*60)
+| table host, OSName, Version, OSArchitecture, Domain, Manufacturer, Model, MemoryMB, Proc_Logical_Real, Status, Organization, RegisteredUser, UpTime 
+| sort host 
+| rename host AS "Host", OSName AS "OS", OSArchitecture AS "Architecture", MemoryMB AS "Memory (MB)", Proc_Logical_Real AS "Processors (Logical/Real)", RegisteredUser AS "Registered User", UpTime AS "Up Time (Days)" 
+            </searchString>
+            <title>System Information</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+    
+ 
+    
+        <row>
+        <table>
+            <searchString>
+| search host=$hostname$ `wlslogs` WLSPerformance | table _time,PrivateMemoryBytes,ProcessingTimeMS,UserTimeMS,LogsError,LogsFiltered,LogsOld,LogsReceived,LogsSent,LogsWLS | sort -_time
+            </searchString>
+            <title>WLS Performance</title>
+            <option name="count">4</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+  
+    
+    <row>
+        <table>
+            <searchString>
+| search `wlslogs` host=$hostname$ eventtype=wls WLSAudit Message="Network Adapters" 
+| head 1 
+| rex max_match=99 field=_raw "IPAddress[^=]*=\"(?&lt;IpAddress&gt;[^\"]*)" 
+| rex max_match=99 field=_raw "MACAddress[^=]*=\"(?&lt;MacAddress&gt;[^\"]*)" 
+| eval fields=mvzip(IpAddress,MacAddress) 
+| mvexpand fields 
+| rex field=fields "(?&lt;IPAddress&gt;[^,]*),(?&lt;MACAddress&gt;.*)" 
+| table IPAddress,MACAddress
+            </searchString>
+            <title>Recent Network Adapter Information</title>
+            <option name="count">5</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+    <row>
+        <table>
+            <searchString>
+| search host=$hostname$ `wlslogs` (EventID=4624 OR EventID=4625 OR EventID=528 OR EventID=529 OR EventID=540) NOT UserName="NETWORK SERVICE" NOT UserName="*$" NOT TargetUserName="SYSTEM" NOT TargetUserName="*$" 
+| eval UserName=if(isnull(TargetUserName),UserName,TargetUserName) 
+| eval Domain=if(isnull(TargetDomainName),Domain,TargetDomainName) 
+| dedup LogonType, UserName, Domain 
+| table _time, host, UserName, Domain, LogonType, LogonTypeDescription 
+| sort -_time 
+| rename host AS Host, UserName AS "User",LogonType AS "Logon Type", LogonTypeDescription AS "Logon Description"
+            </searchString>
+            <title>Users</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+    <row>
+        <table>
+            <searchString>
+| search host=$hostname$ index=windows LogType=WindowsEventLog (CLIENTNAME="*" OR SESSIONNAME="*") NOT SESSIONNAME=Console   | table _time,CLIENTNAME,SESSIONNAME,BaseFileName,CreatorProcessName,CommandLine | sort -_time
+            </searchString>
+            <title>Remote Sessions From Processes</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>    
+    <row>
+     <table>
+      <searchString>
+| search `wlslogs` host=$hostname$ ProviderName="Microsoft-Windows-Reliability-Analysis-Engine" 
+| table _time,Stability
+         </searchString>
+      <title>Host Stability</title>
+      <option name="count">15</option>
+      <option name="displayRowNumbers">true</option>
+    </table>
+    </row>
+    <row>
+        <table>
+            <searchString>
+| search `wlslogs` host=$hostname$ WLS_PerfCounter CategoryName="Processor" CounterName="% Processor Time" 
+| stats sparkline(avg(Value)) as CPULoad, max(Value) as MaxCPU, avg(Value) as AvgCPU by host 
+| join type=outer host [ | search host=$hostname$ WLS_PerfCounter CategoryName="Memory" OR CounterName="% Committed Bytes In Use" | stats sparkline(avg(Value)) as MemUsage, max(Value) as MaxMem, avg(Value) as AvgMem by host ]
+| makemv delim="," setsv=true MemUsage
+| table host, CPULoad, AvgCPU, MaxCPU, MemUsage, AvgMem, MaxMem 
+| sort host 
+| rename host AS "Host", CPULoad AS "CPU Load", AvgCPU AS "Average CPU Load", MaxCPU AS "Maximum CPU Load", MemUsage AS "Memory Usage", AvgMem AS "Average Memory Usage", MaxMem AS "Maximum Memory Usage" 
+            </searchString>
+            <title>System Performance</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+    <row>
+        <table>
+            <searchString>
+| multisearch [ | search `wlslogs` host=$hostname$ WLS_PerfCounter CategoryName="LogicalDisk" CounterName="% Free Space" | rename Value AS PercentFreeSpace ] [ | search `wlslogs` host=$hostname$ WLS_PerfCounter CategoryName="LogicalDisk" CounterName="Free Megabytes" | rename Value AS FreeSpaceMB ]
+| selfjoin host, GroupID, InstanceName 
+| search FreeSpaceMB=* PercentFreeSpace=* 
+| dedup host, InstanceName sortby -_time 
+| eval size=(FreeSpaceMB/(PercentFreeSpace/100))/1024 
+| eval used=size-(FreeSpaceMB/1024) 
+| eval avail=FreeSpaceMB/1024 
+| eval percent_used=100-PercentFreeSpace 
+| sort host, InstanceName 
+| table host, InstanceName, size, used, avail, percent_used
+| rename host AS "Host", InstanceName AS "Volume", size AS "Size (GB)", used AS "Used (GB)", avail AS "Available (GB)", percent_used AS "Percent Used"
+            </searchString>
+            <title>System Drives</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+    <row>
+        <table>
+            <searchString>
+| search `wlslogs` host=$hostname$ (WLS_DeviceMonitor OR WLS_DriveMonitor) DriveType="5" FileSystem="*" 
+| table _time,host,Description,FileSystem,MediaType,Size,VolumeName,VolumeSerialNumber
+            </searchString>
+            <title>Media</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+    
+    <row>
+        <table>
+            <searchString>
+| search `wlslogs` host=$hostname$ WLS_DeviceMonitor NOT CompatibleID="USB*" NOT (ChangeType="Changed" AND Description="Local Fixed Disk") 
+| fillnull value=""
+| table _time,ChangeType,Status,Manufacturer,Caption
+| sort -_time
+            </searchString>
+            <title>Non-USB Device Monitor</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+        <row>
+        <table>
+            <searchString>
+| search `wlslogs` host=$hostname$ WLS_DeviceMonitor CompatibleID="USB*" 
+| `getusbclassinfo` | `getusbmodelinfo`
+| fillnull value=""
+| table _time,ChangeType,Status,Caption,USBMfrName,USBModelName,FullUSBDescription
+| sort -_time
+            </searchString>
+            <title>USB Device Monitor</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+        
+     <row>
+        <table>
+            <searchString>
+| search `wlslogs` host=$hostname$ DriveMonitor FullPath=* | table _time,ChangeType,FullPath,OldFullPath
+            </searchString>
+            <title>Removable Drive File Monitor</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+     <row>
+        <table>
+            <searchString>
+| search `wlslogs` host=$hostname$ WLS_PortMonitor 
+| dedup Port 
+| search  NOT ChangeType=Removed 
+| search NOT Address="localhost*" 
+| table ProcessId,ProcessName,Port,Protocol,Address,State 
+| sort Port
+            </searchString>
+            <title>Port Monitor</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+    
+    <row>
+        <table>
+            <searchString>
+| search `wlslogs` host=$hostname$ (EventID="592" OR EventID="4688") NewHash=True 
+| reverse 
+| dedup MD5 
+| reverse 
+| convert ctime(_time) AS time
+| fillnull value=""
+| table time, BaseFileName, CompanyName, FileDescription, FileVersion, InternalName, CommandLine, MD5, CreatorProcessName
+| sort -time
+| rename time AS "Time", BaseFileName AS "Base File Name", CompanyName AS "Company Name", FileDescription AS "File Description", FileVersion AS "File Version", InternalName AS "Internal Name", CommandLine AS "Command Line", MD5 AS "MD5 Hash", CreatorProcessName AS "Creator Process Name"
+            </searchString>
+            <title>New MD5s</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+    <row>
+        <table>
+            <searchString>
+| search `wlslogs` host=$hostname$ WLS_NamedPipeMonitor 
+| convert ctime(_time) AS time
+| fillnull value=""
+| table time, ChangeType, Name 
+| sort -time
+| rename time AS "Time", ChangeType AS "Change Type"
+            </searchString>
+            <title>Named Pipes</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+    <row>
+        <table>
+            <searchString>
+| search `wlslogs` host=$hostname$ WLS_WinObjectMonitor 
+| convert ctime(_time) AS time
+| fillnull value=""
+| table time, ChangeType, Name, Type 
+| sort -time
+| rename time AS "Time", ChangeType AS "Change Type"
+            </searchString>
+            <title>Windows Object Monitor</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+    <row>
+        <table>
+            <searchString>
+| search `wlslogs` host=$hostname$ WLS_ModuleMonitor 
+| convert ctime(_time) AS time
+| fillnull value=""
+| table time, ChangeType, FileName, CompanyName, FileDescription, NewHash, MD5 
+| sort -time
+| rename time AS "Time", ChangeType AS "Change Type", FileName AS "File Name", CompanyName AS "Company Name", FileDescription AS "File Description", NewHash AS "New Hash", MD5 AS "MD5 Hash"
+            </searchString>
+            <title>Module Monitor</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+    <row>
+        <table>
+            <searchString>
+| search `wlslogs` host=$hostname$ WLS_FileMonitor 
+| convert ctime(_time) AS time
+| fillnull value=""
+| table time, MonitorName, ChangeType, FullPath, OldFullPath
+| sort -time
+| rename time AS "Time", MonitorName AS "Monitor Name", ChangeType AS "Change Type", FullPath AS "Full Path", OldFullPath AS "Old Full Path"
+            </searchString>
+            <title>File Monitor</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+    <row>
+        <table>
+            <searchString>
+| search `wlslogs` host=$hostname$ WLS_RegistryMonitor 
+| convert ctime(_time) AS time
+| fillnull value=""
+| table time, MonitorName, ChangeType, FullPath, Name, Value, OldValue
+| sort -time
+| rename time AS "Time", MonitorName AS "Monitor Name", ChangeType AS "Change Type", FullPath AS "Full Path", OldValue AS "Old Value"
+            </searchString>
+            <title>Registry Monitor</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+    </row>
+</form>

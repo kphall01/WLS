@@ -1,0 +1,82 @@
+[]
+access = read : [ * ], write : [ admin ]
+export = system
+version = 5.0.3
+modtime = 1371072099.877806000
+
+[nav/default]
+version = 5.0.2
+modtime = 1368543542.873039000
+
+[views/client_overview]
+access = read : [ * ], write : [ admin ]
+export = none
+owner = nobody
+version = 5.0.2
+modtime = 1368195497.866242000
+
+[views/usb_devices]
+access = read : [ * ], write : [ admin ]
+export = none
+owner = nobody
+version = 5.0.3
+modtime = 1372098458.243292000
+
+[lookups/USBSpec.csv]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = nobody
+version = 5.0.2
+modtime = 1368547884.657121000
+
+[macros/getusbclassinfo]
+access = read : [ * ], write : [ admin ]
+export = none
+owner = nobody
+version = 5.0.2
+modtime = 1368639848.390574000
+
+[lookups/USBIDS.csv]
+access = read : [ * ], write : [ admin ]
+owner = nobody
+version = 5.0.2
+modtime = 1368627937.695940000
+
+[macros/getusbmodelinfo]
+access = read : [ * ], write : [ admin ]
+export = system
+owner = nobody
+version = 5.0.3
+modtime = 1372097749.339348000
+
+[views/host_drilldown]
+version = 5.0.3
+modtime = 1376071374.061925000
+
+[views/wls_errors]
+version = 5.0.2
+modtime = 1370023514.375343000
+
+[macros/wlslogs]
+version = 5.0.2
+modtime = 1370286890.042660000
+
+[views/windows_errors]
+version = 5.0.3
+modtime = 1372098300.011824000
+
+[views/media]
+version = 5.0.3
+modtime = 1375975869.110240000
+
+[views/wls_overview]
+version = 5.0.3
+modtime = 1376406170.012904000
+
+[views/print]
+version = 5.0.3
+modtime = 1371563855.392209000
+
+[views/host_overview]
+version = 5.0.3
+modtime = 1376071512.837875000

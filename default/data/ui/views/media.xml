@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='utf-8'?>
+<dashboard>
+  <label>Media Information</label>
+  <row>
+    <table>
+      <searchString>				`wlslogs` (WLS_DeviceMonitor OR WLS_DriveMonitor) DriveType="5" FileSystem="*" NOT VolumeName="IronKey" NOT (VolumeName="Audio CD" AND Size="0")| table _time,host,Description,FileSystem,MediaType,Size,VolumeName,VolumeSerialNumber 
+            </searchString>
+      <title>Data Optical Media</title>
+      <earliestTime>-24h@h</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="count">15</option>
+      <option name="displayRowNumbers">true</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <searchString>				`wlslogs` (WLS_DeviceMonitor OR WLS_DriveMonitor) DriveType="5" FileSystem="*" VolumeName="Audio CD" Size="0"| table _time,host,Description,FileSystem,MediaType,Size,VolumeName,VolumeSerialNumber 
+            </searchString>
+      <title>Audio Optical Media</title>
+      <earliestTime>-24h@h</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="count">15</option>
+      <option name="displayRowNumbers">true</option>
+    </table>
+  </row>
+</dashboard>

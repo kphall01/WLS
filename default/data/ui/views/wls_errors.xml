@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='utf-8'?>
+<dashboard>
+  <label>WLS Errors</label>
+  <row>
+    <table>
+      <searchString>
+| search `wlslogs` WLSError 
+| stats count as ErrorCount by host 
+| sort -num(ErrorCount)
+| rename host AS Host, ErrorCount AS "Error Count"
+            </searchString>
+      <title>All WLS Errors</title>
+      <earliestTime>-24h@h</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="count">15</option>
+      <option name="displayRowNumbers">true</option>
+    </table>
+    <table>
+      <searchString>
+| search `wlslogs` WLSError "sending data failed" 
+| rex field=source "(?&lt;ip&gt;[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})" 
+| eval iphost=ip." ".host 
+| chart sparkline AS ConnectionErrors by iphost
+| rename iphost AS "IP / Host", ConnectionErrors AS "Connection Errors"
+            </searchString>
+      <title>Connection Errors</title>
+      <earliestTime>-24h@h</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="count">15</option>
+      <option name="displayRowNumbers">true</option>
+    </table>
+  </row>
+  <row>
+    <table>
+      <searchString>
+| search `wlslogs` WLSError NOT InitializeGuts NOT WinIOError NOT ssdeep NOT ThrowSecurityException NOT GetPIDData NOT GetVersionInfo NOT GetMD5 NOT "An established connection was aborted by the software in your host machine" NOT "An existing connection was forcibly closed by the remote host" NOT VACUUM NOT DoConnect NOT DoMaintenance NOT "Replacing invalid XML character"
+| join type=outer host [ | search (WLS_WMI MonitorName="OperatingSystem") OR WMI_OperatingSystem | dedup host, Caption | rename Caption AS OS | fields host, OS ] 
+| stats count by OS, WLSVersion, Message 
+| table OS, WLSVersion, count, Message 
+| sort -count 
+| rename WLSVersion AS "WLS Version", count AS Count
+            </searchString>
+      <title>Notable Errors</title>
+      <earliestTime>-24h@h</earliestTime>
+      <latestTime>now</latestTime>
+      <option name="count">15</option>
+      <option name="displayRowNumbers">true</option>
+    </table>
+  </row>
+</dashboard>

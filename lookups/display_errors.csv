@@ -1,0 +1,3 @@
+"EventID","EventDescription"
+"4101","Display driver nvlddmkm stopped responding and has successfully recovered."
+"4107","A caller specified the SDC_FORCE_MODE_ENUMERATION flag in a call to the SetDisplayConfig() API"

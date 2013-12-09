@@ -1,0 +1,216 @@
+<?xml version='1.0' encoding='utf-8'?>
+<form>
+    <label>USB Devices</label>
+     <fieldset>
+        <input type="text" token="hostname">
+            <label>Host</label>
+            <default>*</default>
+        </input>
+        <input type="time">
+            <default>Last 24 hours</default>
+        </input>
+    </fieldset>
+        <row>
+        <table>
+            <searchString>
+				`wlslogs` host=$hostname$ WLS_DeviceMonitor CompatibleID="USB\\*Class_00*SubClass*" | `getusbclassinfo` | `getusbmodelinfo` | table _time,host,ChangeType,Caption,USBMfrName,USBModelName,FullUSBDescription
+            </searchString>
+            <title>Generic Devices</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+	</row>
+    <row>
+        <table>
+            <searchString>
+				`wlslogs` host=$hostname$ WLS_DeviceMonitor CompatibleID="USB\\*Class_01*SubClass*" | `getusbclassinfo` | `getusbmodelinfo` | table _time,host,ChangeType,Caption,USBMfrName,USBModelName,FullUSBDescription
+            </searchString>
+            <title>Audio</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+	</row>
+<row>
+        <table>
+            <searchString>
+				`wlslogs` host=$hostname$ WLS_DeviceMonitor CompatibleID="USB\\*Class_02*SubClass*" |  `getusbclassinfo` | `getusbmodelinfo` | table _time,host,ChangeType,Caption,USBMfrName,USBModelName,FullUSBDescription
+            </searchString>
+            <title>Communication and CDC Control</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+	</row>
+    <row>
+        <table>
+            <searchString>
+				`wlslogs` host=$hostname$ WLS_DeviceMonitor CompatibleID="USB\\*Class_03*SubClass*" |  `getusbclassinfo` | `getusbmodelinfo` | table _time,host,ChangeType,Caption,USBMfrName,USBModelName,FullUSBDescription
+            </searchString>
+            <title>Human Interface Device</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+	</row>
+    <row>
+        <table>
+            <searchString>
+				`wlslogs` host=$hostname$ WLS_DeviceMonitor CompatibleID="USB\\*Class_05*SubClass*" |  `getusbclassinfo`| `getusbmodelinfo` | table _time,host,ChangeType,Caption,USBMfrName,USBModelName,FullUSBDescription
+            </searchString>
+            <title>Physical</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+	</row>
+    <row>
+        <table>
+            <searchString>
+				`wlslogs` host=$hostname$ WLS_DeviceMonitor CompatibleID="USB\\*Class_06*SubClass*" |  `getusbclassinfo` | `getusbmodelinfo` | table _time,host,ChangeType,Caption,USBMfrName,USBModelName,FullUSBDescription
+            </searchString>
+            <title>Image</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+	</row>
+        <row>
+        <table>
+            <searchString>
+				`wlslogs` host=$hostname$ WLS_DeviceMonitor CompatibleID="USB\\*Class_07*SubClass*" | `getusbclassinfo` | `getusbmodelinfo` | table _time,host,ChangeType,Caption,USBMfrName,USBModelName,FullUSBDescription
+            </searchString>
+            <title>Printer</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+	</row>
+        <row>
+        <table>
+            <searchString>
+				`wlslogs` host=$hostname$ WLS_DeviceMonitor CompatibleID="USB\\*Class_08*SubClass*" | `getusbclassinfo` | `getusbmodelinfo` | table _time,host,ChangeType,Caption,USBMfrName,USBModelName,FullUSBDescription
+            </searchString>
+            <title>Mass Storage</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+	</row>
+        <row>
+        <table>
+            <searchString>
+				`wlslogs` host=$hostname$ WLS_DeviceMonitor CompatibleID="USB\\*Class_09*SubClass*" | `getusbclassinfo` | `getusbmodelinfo` | table _time,host,ChangeType,Caption,USBMfrName,USBModelName,FullUSBDescription
+            </searchString>
+            <title>Hub</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+	</row>
+
+        <row>
+        <table>
+            <searchString>
+				`wlslogs` host=$hostname$ WLS_DeviceMonitor CompatibleID="USB\\*Class_0A*SubClass*" |  `getusbclassinfo` | `getusbmodelinfo` | table _time,host,ChangeType,Caption,USBMfrName,USBModelName,FullUSBDescription
+            </searchString>
+            <title>CDC-Data</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+	</row>
+            <row>
+        <table>
+            <searchString>
+				`wlslogs` host=$hostname$ WLS_DeviceMonitor CompatibleID="USB\\*Class_0B*SubClass*" | `getusbclassinfo`  | `getusbmodelinfo` | table _time,host,ChangeType,Caption,USBMfrName,USBModelName,FullUSBDescription
+            </searchString>
+            <title>Smart Card</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+	</row>
+            <row>
+        <table>
+            <searchString>
+				`wlslogs` host=$hostname$ WLS_DeviceMonitor CompatibleID="USB\\*Class_0D*SubClass*" | `getusbclassinfo` | `getusbmodelinfo` | table _time,host,ChangeType,Caption,USBMfrName,USBModelName,FullUSBDescription
+            </searchString>
+            <title>Content Security</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+	</row>
+            <row>
+        <table>
+            <searchString>
+				`wlslogs` host=$hostname$ WLS_DeviceMonitor CompatibleID="USB\\*Class_0E*SubClass*" |  `getusbclassinfo` | `getusbmodelinfo` | table _time,host,ChangeType,Caption,USBMfrName,USBModelName,FullUSBDescription
+            </searchString>
+            <title>Video</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+	</row>
+            <row>
+        <table>
+            <searchString>
+				`wlslogs` host=$hostname$ WLS_DeviceMonitor CompatibleID="USB\\*Class_0F*SubClass*" |  `getusbclassinfo`  | `getusbmodelinfo` | table _time,host,ChangeType,Caption,USBMfrName,USBModelName,FullUSBDescription
+            </searchString>
+            <title>Personal Healthcare</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+	</row>
+     <row>
+        <table>
+            <searchString>
+				`wlslogs` host=$hostname$ WLS_DeviceMonitor CompatibleID="USB\\*Class_10*SubClass*" | `getusbclassinfo`  | `getusbmodelinfo` | table _time,host,ChangeType,Caption,USBMfrName,USBModelName,FullUSBDescription
+            </searchString>
+            <title>Audio/Video Devices</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+	</row>
+    
+            <row>
+        <table>
+            <searchString>
+				`wlslogs` host=$hostname$ WLS_DeviceMonitor CompatibleID="USB\\*Class_DC*SubClass*" |  `getusbclassinfo` | `getusbmodelinfo` | table _time,host,ChangeType,Caption,USBMfrName,USBModelName,FullUSBDescription
+            </searchString>
+            <title>Diagnostic Device</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+	</row>
+            <row>
+        <table>
+            <searchString>
+				`wlslogs` host=$hostname$ WLS_DeviceMonitor CompatibleID="USB\\*Class_E0*SubClass*" |  `getusbclassinfo` | `getusbmodelinfo` | table _time,host,ChangeType,Caption,USBMfrName,USBModelName,FullUSBDescription
+            </searchString>
+            <title>Wireless Controller</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+	</row>
+                <row>
+        <table>
+            <searchString>
+				`wlslogs` host=$hostname$ WLS_DeviceMonitor CompatibleID="USB\\*Class_EF*SubClass*" |  `getusbclassinfo` | `getusbmodelinfo` | table _time,host,ChangeType,Caption,USBMfrName,USBModelName,FullUSBDescription
+            </searchString>
+            <title>Misc</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+	</row>
+                <row>
+        <table>
+            <searchString>
+				`wlslogs` host=$hostname$ WLS_DeviceMonitor CompatibleID="USB\\*Class_FE*SubClass*" |  `getusbclassinfo` | `getusbmodelinfo` | table _time,host,ChangeType,Caption,USBMfrName,USBModelName,FullUSBDescription
+            </searchString>
+            <title>Application Specific</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+	</row>
+                <row>
+        <table>
+            <searchString>
+				`wlslogs` host=$hostname$ WLS_DeviceMonitor CompatibleID="USB\\*Class_FF*SubClass*" | `getusbclassinfo`  | `getusbmodelinfo` | table _time,host,ChangeType,Caption,USBMfrName,USBModelName,FullUSBDescription
+            </searchString>
+            <title>Vendor Specific</title>
+            <option name="count">15</option>
+            <option name="displayRowNumbers">true</option>
+        </table>
+	</row>         
+    
+</form>
